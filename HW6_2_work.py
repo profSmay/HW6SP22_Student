@@ -143,10 +143,11 @@ class Pipe():
     def frictionHeadLoss(self):  # calculate headloss through a section of pipe in m of fluid
         '''
         Use the Darcy-Weisbach equation to find the head loss through a section of pipe.
+        DeltaP=f*(L/d)*(rho*V^2)/2
         '''
         g = 9.81  # m/s^2
         ff = self.FrictionFactor()
-        hl = ff*(self.length/self.d)*(self.fluid.rho*self.V()**2)/2.0  # calculate the head loss in m of water
+        hl = ff*(self.length/self.d)*(self.fluid.rho*self.V()**2)/(2.0*g)  # calculate the head loss in m of water
         return hl
 
     def getFlowHeadLoss(self, s):
@@ -173,7 +174,7 @@ class Pipe():
         return self.startNode==node or self.endNode==node
 
     def printPipeFlowRate(self):
-        print('The flow in segment {} is {:0.2f} L/s'.format(self.Name(),self.Q))
+        print('The flow in segment {} is {:0.2f} L/s and Re={:.1f}'.format(self.Name(),self.Q, self.reynolds))
 
     def getFlowIntoNode(self, n):
         '''
@@ -307,7 +308,7 @@ def main():
     :return:
     '''
     #instantiate a Fluid object to define the working fluid as water
-    water= Fluid()
+    water= Fluid(mu=0.00089, rho=1000.0)
     roughness = 0.00025  # in meters
 
     #instantiate a new PipeNetwork object
