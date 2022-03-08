@@ -3,7 +3,6 @@ import math
 from scipy.optimize import fsolve
 import random as rnd
 
-#JES broken code in Fluid class
 class Fluid():
     def __init__(self, mu=0.00089, rho=1000):
         '''
@@ -11,11 +10,10 @@ class Fluid():
         :param mu: dynamic viscosity in Pa*s -> (kg*m/s^2)*(s/m^2) -> kg/(m*s)
         :param rho: density in kg/m^3
         '''
-        self.mu= # $JES MISSING CODE$  # simply make a copy of the value in the argument as a class property
-        self.rho= # $JES MISSING CODE$  # simply make a copy of the value in the argument as a class property
-        self.nu= #JES MISSING CODE$ # calculate the kinematic viscosity in units of m^2/s
+        self.mu= mu  # simply make a copy of the value in the argument as a class property
+        self.rho= rho  # simply make a copy of the value in the argument as a class property
+        self.nu= self.mu/self.rho # calculate the kinematic viscosity in units of m^2/s
 
-#JES broken code in Node class
 class Node():
     def __init__(self, Name='a', Pipes=[], ExtFlow=0):
         '''
@@ -31,15 +29,14 @@ class Node():
     def getNetFlowRate(self):
         '''
         Calculates the net flow rate into this node in L/s
-        # :return:
+        # :return: the net flow rate into this node
         '''
-        Qtot=#$JES MISSING CODE$  #count the external flow first
+        Qtot=self.extFlow  #count the external flow first
         for p in self.pipes:
             #retrieves the pipe flow rate (+) if into node (-) if out of node.  see class for pipe.
             Qtot+=p.getFlowIntoNode(self.name)
         return Qtot
 
-#JES nothing broken in Loop class
 class Loop():
     def __init__(self, Name='A', Pipes=[]):
         '''
@@ -66,7 +63,6 @@ class Loop():
             startNode=p.endNode if startNode!=p.endNode else p.startNode #move to the next node
         return deltaP
 
-#JES broken code in pipe class
 class Pipe():
     def __init__(self, Start='A', End='B',L=100, D=200, r=0.00025, fluid=Fluid()):
         '''
@@ -98,7 +94,7 @@ class Pipe():
         Calculate average velocity in the pipe for volumetric flow self.Q
         :return:the average velocity in m/s
         '''
-        self.vel= #$JES MISSING CODE$  # the average velocity is Q/A (be mindful of units)
+        self.vel= abs(self.Q)/(1000.0*self.A)  # the average velocity is Q/A (be mindful of units)
         return self.vel
 
     def Re(self):
@@ -106,7 +102,7 @@ class Pipe():
         Calculate the reynolds number under current conditions.
         :return:
         '''
-        self.reynolds= #$JES MISSING CODE$ # Re=rho*V*d/nu, be sure to use V() so velocity is updated.
+        self.reynolds= self.V()*self.d/self.fluid.nu # Re=rho*V*d/mu, be sure to use V() so velocity is updated.
         return self.reynolds
 
     def FrictionFactor(self):
@@ -150,7 +146,7 @@ class Pipe():
         '''
         g = 9.81  # m/s^2
         ff = self.FrictionFactor()
-        hl = #$JES MISSING CODE$ # calculate the head loss in m of water
+        hl = ff*(self.length/self.d)*(self.fluid.rho*self.V()**2)/2.0  # calculate the head loss in m of water
         return hl
 
     def getFlowHeadLoss(self, s):
@@ -189,7 +185,6 @@ class Pipe():
             return -self.Q
         return self.Q
 
-#JES broken code in pipe class
 class PipeNetwork():
     def __init__(self, Pipes=[], Loops=[], Nodes=[], fluid=Fluid()):
         '''
@@ -225,13 +220,13 @@ class PipeNetwork():
             """
             #update the flow rate in each pipe object
             for i in range(len(self.pipes)):
-                self.pipes[i].Q= #$JES MISSING CODE$  # set volumetric flow rate from input argument q
+                self.pipes[i].Q= q[i]  # set volumetric flow rate from input argument q
             #calculate the net flow rate for the node objects
             # note:  when flow rates in pipes are correct, the net flow into each node should be zero.
-            L= #$JES MISSING CODE$  # call the getNodeFlowRates function of this class
+            L= self.getNodeFlowRates()  # call the getNodeFlowRates function of this class
             #calculate the net head loss for the loop objects
             # note: when the flow rates in pipes are correct, the net head loss for each loop should be zero.
-            L+= #$JES MISSING CODE$  # call the getLoopHeadLoss function of this class
+            L+= self.getLoopHeadLosses()  # call the getLoopHeadLoss function of this class
             return L
         #using fsolve to find the flow rates
         FR=fsolve(fn,Q0)
@@ -312,11 +307,11 @@ def main():
     :return:
     '''
     #instantiate a Fluid object to define the working fluid as water
-    water=#$JES MISSING CODE$  #
+    water= Fluid()
     roughness = 0.00025  # in meters
 
     #instantiate a new PipeNetwork object
-    PN=#$JES MISSING CODE$  #
+    PN=PipeNetwork()
     #add Pipe objects to the pipe network (see constructor for Pipe class)
     PN.pipes.append(Pipe('a','b',250, 300, roughness, water))
     PN.pipes.append(Pipe('a','c',100, 200, roughness, water))
