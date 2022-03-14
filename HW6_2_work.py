@@ -144,10 +144,11 @@ class Pipe():
         '''
         Use the Darcy-Weisbach equation to find the head loss through a section of pipe.
         DeltaP=f*(L/d)*(rho*V^2)/2
+        I know that DeltaP=rho*g*h, so h=DeltaP/(rho*g) =f*(L/d)*(V^2)/2
         '''
         g = 9.81  # m/s^2
         ff = self.FrictionFactor()
-        hl = ff*(self.length/self.d)*(self.fluid.rho*self.V()**2)/(2.0*g)  # calculate the head loss in m of water
+        hl = ff*(self.length/self.d)*(self.V()**2)/(2.0*g)  # calculate the head loss in m of water
         return hl
 
     def getFlowHeadLoss(self, s):
